@@ -37,7 +37,7 @@ def add_character_at_location(balx,baly):
 while run: 
 	pygame.time.delay(10)
 	
-	balloon_col = pygame.Rect(balx, baly, 47, 53)
+	balloon_col = pygame.Rect(balx, baly, 37, 49)
 	plat1_col = pygame.Rect(plat1x, plat1y, width, height)
 	plat2_col = pygame.Rect(plat2x, plat2y, width, height)
 
@@ -67,8 +67,8 @@ while run:
 
 	if balx<0: 
 		balx = 0
-	if balx > screen_width-47:
-		balx = screen_width-47
+	if balx > screen_width-37:
+		balx = screen_width-37
 
 	if baly<screen_height-height: 
 		baly += gravity
@@ -77,7 +77,7 @@ while run:
 	
 	pygame.draw.rect(win, (0, 0, 255), (plat1x, plat1y, width, height))
 	pygame.draw.rect(win, (0, 255, 0), (plat2x, plat2y, width, height))
-	#pygame.draw.rect(win, (255, 0, 0), (balx, baly, 47, 53))
+	#pygame.draw.rect(win, (255, 0, 0), (balx, baly, 37, 49))
 	
 	
 	if balloon_col.colliderect(plat1_col):
