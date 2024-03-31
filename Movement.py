@@ -1,7 +1,17 @@
 import pygame
 import random
+import json
 
 pygame.init() 
+
+JsonFile = open('Questions.json')
+
+JsonData = json.load(JsonFile)
+
+for i in JsonData['Questions']:
+	print(i)
+
+JsonFile.close()
 
 screen_width = 800
 screen_height = 600
