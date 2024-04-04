@@ -2,16 +2,19 @@ import pygame
 import random
 import json
 
+def GenerateQuestion() :
+	JsonFile = open('Questions.json')
+	JsonData = json.load(JsonFile)
+	CurrentQuestion = JsonData['Questions'][random.randrange(0, len(JsonData['Questions']))]
+	print(CurrentQuestion)
+	JsonFile.close()
+
+
 pygame.init() 
 
-JsonFile = open('Questions.json')
 
-JsonData = json.load(JsonFile)
+GenerateQuestion()
 
-for i in JsonData['Questions']:
-	print(i)
-
-JsonFile.close()
 
 screen_width = 800
 screen_height = 600
