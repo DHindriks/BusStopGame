@@ -8,7 +8,14 @@ pygame.init()
 #Screen properties
 screen_width = 800
 screen_height = 600
-win = pygame.display.set_mode((screen_width, screen_height)) 
+win = pygame.display.set_mode((screen_width, screen_height))
+
+#in-game font
+font = pygame.font.SysFont("Arial", 30)
+
+CurrentQuestion = "DefaultQuestion"
+Answer1 = "DefaultAns1"
+Answer2 = "DefaultAns2"
 
 #Sets window title
 pygame.display.set_caption("Moving rectangle") 
@@ -62,15 +69,26 @@ def add_balloon_at_location(balx,baly):
 def GenerateQuestion() :
 	JsonFile = open('Questions.json')
 	JsonData = json.load(JsonFile)
-	CurrentQuestion = JsonData['Questions'][random.randrange(0, len(JsonData['Questions']))]
-	print(CurrentQuestion)
-	JsonFile.close()
+	GeneratedQuestion = JsonData['Questions'][random.randrange(0, len(JsonData['Questions']))]
+	JsonFile.close()	
+	global CurrentQuestion
+	CurrentQuestion = GeneratedQuestion['Question']
+	global Answer1
+	Answer1 = GeneratedQuestion['Answer1']
+	global Answer2
+	Answer2 = GeneratedQuestion['Answer2']
+
+#draw text
+def draw_text(text, font, text_col, x, y):
+	img = font.render(text, True, text_col)
+	win.blit(img, (x, y))
+	
+GenerateQuestion()
 
 #Runs the code as long as the game is running
 while run: 
 	pygame.time.delay(10)
 	
-	GenerateQuestion()
 	
 	balloon_col = pygame.Rect(balx, baly, 37, 49)
 	plat1_col = pygame.Rect(plat1x, plat1y, width, height)
@@ -124,6 +142,11 @@ while run:
 	pygame.draw.rect(win, (255, 0, 0), (left_box_x, box_y, box_width, box_height))
 	pygame.draw.rect(win, (255, 0, 0), (right_box_x, box_y, box_width, box_height))
 	
+	#Draw the question texts
+	draw_text(CurrentQuestion, font, (255, 255, 255), 0, 150)
+	draw_text(Answer1, font, (255, 255, 255), left_box_x, screen_height-50)
+	draw_text(Answer2, font, (255, 255, 255), right_box_x, screen_height-50)
+
 	#Checks if the balloon hits the left platform
 	if balloon_col.colliderect(plat1_col):
 		bouncey = 5
