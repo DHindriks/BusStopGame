@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 import json
+import os
 
 pygame.init() 
 
@@ -58,6 +59,21 @@ box_y = screen_height - box_height
 left_box_x = 50 
 right_box_x = screen_width - box_width - 50
 
+#Open log file at start, creates the file if file doesn't exist already
+LogJsonFile = open('questionlog.json', 'a')
+
+def LogAnswers(Answer) :
+	if LogJsonFile.closed:
+		LogJsonFile = open('questionlog.json', 'a')
+
+	#Data that will be written
+	dictionary = {
+		"Question": CurrentQuestion,
+		"Answer": Answer
+	}
+
+	JsonObj = json.dumps(dictionary, indent=2)
+
 #Run!
 run = True
 
@@ -77,6 +93,11 @@ def GenerateQuestion() :
 	Answer1 = GeneratedQuestion['Answer1']
 	global Answer2
 	Answer2 = GeneratedQuestion['Answer2']
+
+
+
+
+
 
 #draw text
 def draw_text(text, font, text_col, x, y):
