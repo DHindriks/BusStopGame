@@ -6,60 +6,61 @@ import json
 
 pygame.init() 
 
-#Screen properties
+# Screen properties
 screen_width = 800
 screen_height = 600
 win = pygame.display.set_mode((screen_width, screen_height)) 
 
-#Sets window title
+# Sets window title
 pygame.display.set_caption("Moving rectangle") 
 
-#Starting position of the ball
+# Starting position of the ball
 balx = screen_width/2
 baly = screen_height/2
 
-#Platform properties
+# Platform properties
 width = 100
 height = 20
 
-#Gravity properties
+# Gravity properties
 vel = 1
 gravity = 1
 
-#Speed of the player platforms
+# Speed of the player platforms
 platSpeed = 2
 
-#Left platform starting position
+# Left platform starting position
 plat1x = 100
 plat1y = screen_height-100
 
-#Right platform starting position
+# Right platform starting position
 plat2x = 500
 plat2y = screen_height-100
 
-#Importing image(s)
+# Importing image(s)
 character = pygame.image.load('balloon.png')
 
-#Left/Right bouncing properties
+# Left/Right bouncing properties
 bouncey = 1
 bouncex = 0
 xmemory = 0
 
-#Answer basket properties
+# Answer basket properties
 box_width = 100
 box_height = 50
 box_y = screen_height - box_height
 left_box_x = 50 
 right_box_x = screen_width - box_width - 50
 
-#checks if the menu needs to pop-up
+# checks if the menu needs to pop-up
 menuTime = True
 
-#is the mouse inside a button?
-mouseOnButton = False
-
-#Run!
+# Run!
 run = True
+
+# Set up timing
+clock = pygame.time.Clock()
+last_increment_time = pygame.time.get_ticks()
 
 #Function to draw balloon
 def add_balloon_at_location(balx,baly):
@@ -77,21 +78,17 @@ class menuButton(pygame.sprite.Sprite):
 		self.buttonHeight = buttonHeight
 		self.buttonText = buttonText
 		
-		self.color = (70,70,200)
+		self.color = (60,40,190)
 		self.rect = pygame.Rect(self.buttonX, self.buttonY, self.buttonWidth, self.buttonHeight)
 		
 		self.textColor = (180, 240, 255)
 		self.font = pygame.font.SysFont('Arial', 25)
-
-		self.transition_duration = 30
-		self.transition_timer = 0
-		self.target_color = (70,70,200)
 		
-	def draw(self):
+	def draw(self): # Draw the button on screen
 		pygame.draw.rect(self.canvas, self.color, self.rect)
 		self.draw_centered_text()
 	
-	def draw_centered_text(self):
+	def draw_centered_text(self): # Draw the text on the button in the center of the button
 		self.text_surface = self.font.render(self.buttonText, True, self.textColor)
 		self.text_rect = self.text_surface.get_rect()
 
@@ -103,7 +100,9 @@ class menuButton(pygame.sprite.Sprite):
 		self.text_rect.topleft = (self.text_x, self.text_y)
 
 		self.canvas.blit(self.text_surface, self.text_rect)
-		
+
+	def change_colour(self, timer): # Change the colour of the button when the mouse hovers over it
+		self.color = (60-(timer*0.02), 40+(timer*0.04), 190+(timer*0.02))
 
 
 class mouse(pygame.sprite.Sprite):
@@ -114,12 +113,28 @@ class mouse(pygame.sprite.Sprite):
 		self.hbHeight = height
 		
 		self.rect = pygame.Rect(0, 0, self.hbWidth, self.hbHeight)
+		self.menuTimer = 0
 	
-	def update(self):
+	def update(self, button): # Update the mouse hitbox and check if it's inside the button
 		self.rect.topleft = pygame.mouse.get_pos()
-	
-startButton = menuButton(screen_width*0.1, (screen_height/2)-50, 200, 100, "Start", win)
-endButton = menuButton((screen_width*0.9)-200, (screen_height/2)-50, 200, 100, "End", win)
+		if theMouse.rect.colliderect(button.rect):
+			if self.menuTimer == 0:
+				self.menuTimer = pygame.time.get_ticks()
+
+			self.elapsed_time = pygame.time.get_ticks() - self.menuTimer
+			if self.elapsed_time < 3000:
+				startButton.change_colour(self.elapsed_time)
+				
+			if self.elapsed_time >= 3000:
+				global menuTime
+				menuTime = False
+		else:
+			self.menuTimer = 0
+			startButton.change_colour(0)
+
+
+
+startButton = menuButton((screen_width*0.5)-100, (screen_height/2)-50, 200, 100, "Start", win)
 theMouse = mouse(1, 1, win)
 
 #Runs the code as long as the game is running
@@ -128,22 +143,16 @@ while run:
 	for event in pygame.event.get(): 
 		if event.type == pygame.QUIT: 
 			run = False
-	
+			
 	#All the Main Menu Stuff happens here
 	if menuTime:
 		win.fill((32, 32, 32))
 		
-		#Draw a hitbox around the mouse
-		theMouse.update()
-			
-		# Check for collision
-		if startButton.rect.colliderect(theMouse.rect):
-			print ("hello")
+		# Update the mouse
+		theMouse.update(startButton)
 		
 		# Draw button
 		startButton.draw()
-		
-		endButton.draw()
 	
 	#If the player chooses start then:
 	else:
