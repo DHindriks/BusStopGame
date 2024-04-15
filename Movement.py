@@ -3,6 +3,7 @@ import sys
 import random
 import json
 import os
+import datetime
 
 pygame.init() 
 
@@ -61,18 +62,8 @@ right_box_x = screen_width - box_width - 50
 
 #Open log file at start, creates the file if file doesn't exist already
 LogJsonFile = open('questionlog.json', 'a')
-
-def LogAnswers(Answer) :
-	if LogJsonFile.closed:
-		LogJsonFile = open('questionlog.json', 'a')
-
-	#Data that will be written
-	dictionary = {
-		"Question": CurrentQuestion,
-		"Answer": Answer
-	}
-
-	JsonObj = json.dumps(dictionary, indent=2)
+AnswersDict = {}
+i = 0
 
 #Run!
 run = True
@@ -95,7 +86,31 @@ def GenerateQuestion() :
 	Answer2 = GeneratedQuestion['Answer2']
 
 
+def LogAnswers(Answer) :
+	global i
+	#Data that will be written
+	global AnswersDict
+	AnswersDict.update({ 
+		 "Question" + str(i):
+		[{
+			"Question": CurrentQuestion,
+			"Answer": Answer
+		}]
+	})
+		
+	i = i + 1
+	if (i >= 20) :
+		SaveAnswers()
+		AnswersDict.clear()
+		i = 0
 
+def SaveAnswers() :
+	global LogJsonFile
+	if LogJsonFile.closed:
+		LogJsonFile = open('questionlog.json', 'a')
+	
+	NewJson = json.dumps({"Session"+str(datetime.datetime.now().strftime("%H%M%S")): AnswersDict}, indent=2, separators=(',', ':'))
+	LogJsonFile.write(NewJson)
 
 
 
@@ -109,8 +124,15 @@ GenerateQuestion()
 #Runs the code as long as the game is running
 while run: 
 	pygame.time.delay(10)
+	keys = pygame.key.get_pressed() 
 	
-	
+	if keys[pygame.K_LEFT]:
+		LogAnswers(Answer1)
+		GenerateQuestion()
+	if keys[pygame.K_RIGHT]:
+		LogAnswers(Answer2)
+		GenerateQuestion()
+
 	balloon_col = pygame.Rect(balx, baly, 37, 49)
 	plat1_col = pygame.Rect(plat1x, plat1y, width, height)
 	plat2_col = pygame.Rect(plat2x, plat2y, width, height)
@@ -121,7 +143,6 @@ while run:
 		if event.type == pygame.QUIT: 
 			run = False
 
-	keys = pygame.key.get_pressed() 
 
 	#Movement for left platform
 	if keys[pygame.K_a] and plat1x>0: 
