@@ -5,6 +5,47 @@ import json
 import os
 import datetime
 
+class Question():
+	#keeps track of the amount of questions that have been asked
+	Counter = 0
+	#Log file, create if it doesn't exist yet
+	LogJsonFile = open('questionlog.json', 'a')
+	#stores Questions and answers
+	AnswersDict = {}
+
+
+	#Stores answers as they are given throughout the game
+	def LogAnswers(self, Answer) :
+		#global Counter
+		#global AnswersDict
+
+		#adds data to the dict
+		self.AnswersDict.update
+		({ 
+			 "Question" + str(self.Counter):
+			[{
+				"Question": CurrentQuestion,
+				"Answer": Answer
+			}]
+		})
+		
+		print(Answer + " Added to list")
+		print(self.AnswersDict)
+
+		self.Counter = self.Counter + 1
+		if (self.Counter >= 20) :
+			self.SaveAnswers()
+			self.AnswersDict.clear()
+			self.Counter = 0
+
+	def SaveAnswers(self) :
+		#global LogJsonFile
+		if self.LogJsonFile.closed:
+			self.LogJsonFile = open('questionlog.json', 'a')
+	
+		NewJson = json.dumps({"Session"+str(datetime.datetime.now().strftime("%H%M%S")): self.AnswersDict}, indent=2, separators=(',', ':'))
+		self.LogJsonFile.write(NewJson)
+
 pygame.init() 
 
 #Screen properties
@@ -60,10 +101,7 @@ box_y = screen_height - box_height
 left_box_x = 50 
 right_box_x = screen_width - box_width - 50
 
-#Open log file at start, creates the file if file doesn't exist already
-LogJsonFile = open('questionlog.json', 'a')
-AnswersDict = {}
-i = 0
+QuestionManager = Question()
 
 #Run!
 run = True
@@ -86,33 +124,6 @@ def GenerateQuestion() :
 	Answer2 = GeneratedQuestion['Answer2']
 
 
-def LogAnswers(Answer) :
-	global i
-	#Data that will be written
-	global AnswersDict
-	AnswersDict.update({ 
-		 "Question" + str(i):
-		[{
-			"Question": CurrentQuestion,
-			"Answer": Answer
-		}]
-	})
-		
-	i = i + 1
-	if (i >= 20) :
-		SaveAnswers()
-		AnswersDict.clear()
-		i = 0
-
-def SaveAnswers() :
-	global LogJsonFile
-	if LogJsonFile.closed:
-		LogJsonFile = open('questionlog.json', 'a')
-	
-	NewJson = json.dumps({"Session"+str(datetime.datetime.now().strftime("%H%M%S")): AnswersDict}, indent=2, separators=(',', ':'))
-	LogJsonFile.write(NewJson)
-
-
 
 #draw text
 def draw_text(text, font, text_col, x, y):
@@ -127,10 +138,10 @@ while run:
 	keys = pygame.key.get_pressed() 
 	
 	if keys[pygame.K_LEFT]:
-		LogAnswers(Answer1)
+		QuestionManager.LogAnswers(Answer1)
 		GenerateQuestion()
 	if keys[pygame.K_RIGHT]:
-		LogAnswers(Answer2)
+		QuestionManager.LogAnswers(Answer2)
 		GenerateQuestion()
 
 	balloon_col = pygame.Rect(balx, baly, 37, 49)
