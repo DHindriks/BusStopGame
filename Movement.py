@@ -6,23 +6,18 @@ import os
 import datetime
 
 class Question():
-	#keeps track of the amount of questions that have been asked
-	Counter = 0
-	#Log file, create if it doesn't exist yet
-	LogJsonFile = open('questionlog.json', 'a')
-	#stores Questions and answers
-	AnswersDict = {}
-
+	
+	def __init__(self):
+		self.AnswersDict = []
+		self.Counter = 0
+		self.LogJsonFile = open('questionlog.json', 'a')
 
 	#Stores answers as they are given throughout the game
-	def LogAnswers(self, Answer) :
-		#global Counter
-		#global AnswersDict
+	def LogAnswers(self, CurrentQuestion, Answer) :
+		#adds data to the list
+		self.AnswersDict.append({
 
-		#adds data to the dict
-		self.AnswersDict.update
-		({ 
-			 "Question" + str(self.Counter):
+			"Question" + str(self.Counter):
 			[{
 				"Question": CurrentQuestion,
 				"Answer": Answer
@@ -32,10 +27,10 @@ class Question():
 		print(Answer + " Added to list")
 		print(self.AnswersDict)
 
-		self.Counter = self.Counter + 1
-		if (self.Counter >= 20) :
+		self.Counter += 1
+		if (self.Counter >= 10) :
 			self.SaveAnswers()
-			self.AnswersDict.clear()
+			self.AnswersDict.clear() #session should stop here
 			self.Counter = 0
 
 	def SaveAnswers(self) :
@@ -138,10 +133,10 @@ while run:
 	keys = pygame.key.get_pressed() 
 	
 	if keys[pygame.K_LEFT]:
-		QuestionManager.LogAnswers(Answer1)
+		QuestionManager.LogAnswers(CurrentQuestion, Answer1)
 		GenerateQuestion()
 	if keys[pygame.K_RIGHT]:
-		QuestionManager.LogAnswers(Answer2)
+		QuestionManager.LogAnswers(CurrentQuestion, Answer2)
 		GenerateQuestion()
 
 	balloon_col = pygame.Rect(balx, baly, 37, 49)
