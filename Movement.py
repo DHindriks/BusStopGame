@@ -23,23 +23,35 @@ class Question():
 				"Answer": Answer
 			}]
 		})
-		
-		print(Answer + " Added to list")
-		print(self.AnswersDict)
 
 		self.Counter += 1
 		if (self.Counter >= 10) :
-			self.SaveAnswers()
+			self.append_to_json()
 			self.AnswersDict.clear() #session should stop here
 			self.Counter = 0
 
-	def SaveAnswers(self) :
-		#global LogJsonFile
+	def SaveAnswers(self) : #TODO: Remove this function
+		global LogJsonFile
 		if self.LogJsonFile.closed:
 			self.LogJsonFile = open('questionlog.json', 'a')
-	
 		NewJson = json.dumps({"Session"+str(datetime.datetime.now().strftime("%H%M%S")): self.AnswersDict}, indent=2, separators=(',', ':'))
 		self.LogJsonFile.write(NewJson)
+
+	def append_to_json(self):
+
+		if os.path.exists('questionlog.json') and os.path.getsize('questionlog.json') > 0:
+			with open('questionlog.json', 'r+') as file:
+				print('SAVING')
+				self.file_data = json.load(file)
+		else:
+			print('SAVING MT')
+			self.file_data = {}
+
+		self.file_data.update({"Session"+str(datetime.datetime.now().strftime("%H%M%S")): self.AnswersDict})
+
+		with open('questionlog.json', 'w') as file:
+			json.dump(self.file_data, file, indent=4) 
+
 
 pygame.init() 
 
